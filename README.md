@@ -65,13 +65,13 @@ A high-performance, concurrent money transfer system built with Go. This system 
 
 ## Running the Application
 
-### Start the server
+### Start the server without test users at port (8080)
 
 ```bash
 go run main.go
 ```
 
-### Start the server with test users
+### Start the server with test users at port (8080)
 
 ```bash
 go run main.go with_test_users
@@ -209,6 +209,24 @@ This approach ensures that:
 - **Singleton pattern**: Service and repository instances are implemented as singletons
 - **Layered architecture**: The system follows a clean separation of concerns with controllers, services, and repositories
 - **Explicit locking**: The system uses explicit locking on wallets rather than relying on database transactions
+
+## Functional Tests Written
+### User
+- TestCreateUser
+- TestGetUser
+- TestInvalidEmailFormat
+- TestInvalidPhoneFormat
+- TestPasswordTooShort
+- TestEmailIsRequired
+
+### Transactions
+- TestTransferMoney
+- TestGetTransaction
+- TestValidateNegativeAmountTransferMoneyRequest
+- TestValidateSenderAndReceiverSameTransferMoneyRequest
+- TestValidateSenderDoesNotExistTransferMoneyRequest
+- TestCannotTransferMoreThanBalance
+- TestConcurrentTransferMoney (Make 50k concurrent transfers) and validate that all transfers are sucessful, no money is lost, final wallet balance correct.
 
 ## Future Improvements
 
