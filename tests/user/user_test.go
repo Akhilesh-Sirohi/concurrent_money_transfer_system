@@ -25,9 +25,13 @@ func TestCreateUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	// Create a user first
-	tests.MakeRequestAndValidateResponse(t, testData["TestCreateUser"])
+	test_data := testData["TestCreateUser"]
+	test_data.Request.Body["id"] = "abc2"
+	test_data.Response.Body["id"] = "abc2"
+	tests.MakeRequestAndValidateResponse(t, test_data)
 	// Get the user
 	tests.MakeRequestAndValidateResponse(t, testData["TestGetUser"])
+
 }
 
 func TestInvalidEmailFormat(t *testing.T) {

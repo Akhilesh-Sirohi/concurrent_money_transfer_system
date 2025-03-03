@@ -12,6 +12,7 @@ A high-performance, concurrent money transfer system built with Go. This system 
 - RESTful API for all operations
 
 ## Project Structure 
+```
 ├── internals/
 │ ├── server/
 │ │ └── router.go
@@ -76,7 +77,13 @@ go run main.go
 go run main.go with_test_users
 ```
 
-This will create several test users with pre-loaded wallets for testing purposes.
+This will create 3 test users with pre-loaded wallets for testing purposes with details as follows:
+
+- User 1: id = 1, First Name = Mark, Email = mark@facebook.com, Phone Number = +1234567890, balance = 100$
+- User 2: id = 2, First Name = Jane, Email = jane@gmail.com, Phone Number = +1234567890, balance = 50$
+- User 3: id = 3, First Name = Adam, Email = adam@gmail.com, Phone Number = +1234567890, balance = 0$
+
+
 
 ## API Documentation
 
@@ -151,31 +158,57 @@ Run all tests:
 go test ./...
 ```
 
+Run user tests:
+
+```bash
+go test ./tests/user
+```
+
 Run transaction tests:
 
 ```bash
 go test ./tests/transaction
 ```
 
-## Concurrency Model
+## Locking Strategy
 
-The system uses a mutex-based locking mechanism to ensure safe concurrent access to wallet balances. When a transaction is initiated:
+The system uses a mutex-based locking mechanism to ensure safe concurrent access to wallet balances. 
 
-1. Locks are acquired on both sender and receiver wallets in a consistent order to prevent deadlocks
-2. Balances are checked and updated atomically
-3. Locks are released after the transaction is completed
+## Key Components
+
+1. **Per-Wallet Mutex**
+   - Each wallet has its own dedicated mutex
+   - This ensures that only one transaction can modify a wallet's balance at a time
+   - Enables concurrent operations on different wallets without interfering with each other
+
+2. **Deadlock Prevention**
+   - Always acquires locks in a deterministic order (by wallet ID)
+   - If sender ID < receiver ID: locks sender first, then receiver
+   - If receiver ID < sender ID: locks receiver first, then sender
+   - This ensures that no two transactions can wait indefinitely for each other to release their locks, preventing deadlocks
+
+2. **Locking Management**
+   - When a transaction is initiated, it acquires locks on both the sender and receiver wallets using `GetWalletForUpdate` that acquires the lock via walletMutex.(*sync.Mutex).Lock()
+   - This ensures that no other transactions can modify the balances of the sender or receiver wallets until the current transaction is complete
+   - Deferred calls to ReleaseGetWalletForUpdateLock ensure locks are released after the transaction is completed or if panics occur
+
+4. **Transaction Atomicity**
+   - Locks are held throughout the entire transaction process ensuring that the transaction is atomic and consistent
+   - If any part of the transaction fails, the locks are released and the transaction is rolled back
 
 This approach ensures that:
 - No race conditions occur during balance updates
-- Insufficient balance conditions are properly detected
-- The system maintains consistency even under high concurrency
+- No deadlocks occur
+- No Double Spending occurs
+- High throughput for independent transactions
+- Resilience under high concurrency (tested with 50,000 concurrent transfers)
 
 ## Design Decisions
 
 - **In-memory storage**: For simplicity, the system uses in-memory storage with thread-safe data structures
 - **Singleton pattern**: Service and repository instances are implemented as singletons
 - **Layered architecture**: The system follows a clean separation of concerns with controllers, services, and repositories
-- **Explicit locking**: The system uses explicit locking rather than relying on database transactions
+- **Explicit locking**: The system uses explicit locking on wallets rather than relying on database transactions
 
 ## Future Improvements
 

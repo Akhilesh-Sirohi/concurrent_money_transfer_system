@@ -31,13 +31,13 @@
     },
     "TestGetUser": {
         "request": {
-            "url": "api/user/abc1",
+            "url": "api/user/abc2",
             "method": "GET"
         },
         "response": {
             "status": 200,
             "body":{
-                "id": "abc1",
+                "id": "abc2",
                 "first_name": "John",
                 "last_name": "Doe",
                 "email": "john.doe@example.com",
