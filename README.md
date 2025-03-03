@@ -150,25 +150,6 @@ curl --location 'http://127.0.0.1:8080/api/transaction/{transaction_id}'
 curl --location 'http://127.0.0.1:8080/api/transaction/user/{user_id}'
 ```
 
-## Testing
-
-Run all tests:
-
-```bash
-go test ./...
-```
-
-Run user tests:
-
-```bash
-go test ./tests/user
-```
-
-Run transaction tests:
-
-```bash
-go test ./tests/transaction
-```
 
 ## Locking Strategy
 
@@ -210,23 +191,60 @@ This approach ensures that:
 - **Layered architecture**: The system follows a clean separation of concerns with controllers, services, and repositories
 - **Explicit locking**: The system uses explicit locking on wallets rather than relying on database transactions
 
-## Functional Tests Written
-### User
-- TestCreateUser
-- TestGetUser
-- TestInvalidEmailFormat
-- TestInvalidPhoneFormat
-- TestPasswordTooShort
-- TestEmailIsRequired
+# 📌 Functional Tests Overview
 
-### Transactions
-- TestTransferMoney
-- TestGetTransaction
-- TestValidateNegativeAmountTransferMoneyRequest
-- TestValidateSenderAndReceiverSameTransferMoneyRequest
-- TestValidateSenderDoesNotExistTransferMoneyRequest
-- TestCannotTransferMoreThanBalance
-- TestConcurrentTransferMoney (Make 50k concurrent transfers) and validate that all transfers are sucessful, no money is lost, final wallet balance correct.
+This document lists the functional tests implemented for **User Management** and **Transactions** in the system.
+
+---
+
+## 🧑‍💻 User Tests
+
+| **Test Name**                         | **Description** |
+|----------------------------------------|---------------|
+| `TestCreateUser`                       | Validates user creation with correct details. |
+| `TestGetUser`                          | Ensures retrieval of an existing user. |
+| `TestInvalidEmailFormat`               | Tests error handling for invalid email formats. |
+| `TestInvalidPhoneFormat`               | Verifies that phone numbers must follow a valid format. |
+| `TestPasswordTooShort`                 | Ensures a password meets the minimum length requirement. |
+| `TestEmailIsRequired`                  | Confirms that an email field is mandatory during registration. |
+
+---
+
+## 💰 Transaction Tests
+
+| **Test Name**                                      | **Description** |
+|---------------------------------------------------|---------------|
+| `TestTransferMoney`                               | Validates successful money transfer between users. |
+| `TestGetTransaction`                              | Ensures that transaction details can be retrieved. |
+| `TestValidateNegativeAmountTransferMoneyRequest`  | Prevents transactions with negative amounts. |
+| `TestValidateSenderAndReceiverSameTransferMoneyRequest` | Ensures sender and receiver cannot be the same user. |
+| `TestValidateSenderDoesNotExistTransferMoneyRequest` | Verifies that a transfer fails if the sender does not exist. |
+| `TestCannotTransferMoreThanBalance`              | Ensures a user cannot transfer more money than their available balance. |
+| `TestConcurrentTransferMoney`                    | Simulates **50,000 concurrent transfers** to validate: |
+|                                                   | ✅ All transfers succeed without failures. |
+|                                                   | ✅ No money is lost due to race conditions. |
+|                                                   | ✅ Final wallet balances are correctly updated. |
+
+---
+
+## 🛠️ How to Run the Tests
+
+To execute all tests, run:
+```sh
+go test ./tests/... -v
+```
+
+Run user tests:
+
+```bash
+go test ./tests/user
+```
+
+Run transaction tests:
+
+```bash
+go test ./tests/transaction
+```
 
 ## Future Improvements
 
