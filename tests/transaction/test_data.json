@@ -1,0 +1,172 @@
+{
+   "TestTranferMoney": {
+        "Request": {    
+            "Method": "POST",
+            "URL": "api/transaction/transfer",
+            "Body": {
+                "sender_id": "1",
+                "receiver_id": "2",
+                "amount": 1000,
+                "currency": "USD"
+            }
+        },
+        "Response": {
+            "Status": 200,
+            "Body": {
+                "id": "1",
+                "debit_user_id": "1",
+                "credit_user_id": "2",
+                "amount": 1000,
+                "currency": "USD",
+                "status": "completed",
+                "transaction_type": "transfer",
+                "created_at": "2021-01-01T00:00:00Z",
+                "updated_at": "2021-01-01T00:00:00Z"
+            }
+        }
+    },
+    "TestGetTransaction": {
+        "Request": {    
+            "Method": "GET",
+            "URL": "api/transaction/1",
+            "Body": {}
+        },
+        "Response": {
+            "Status": 200,
+            "Body": {
+                "id": "1",
+                "debit_user_id": "1",
+                "credit_user_id": "2",
+                "amount": 1000,
+                "currency": "USD",
+                "status": "completed",
+                "transaction_type": "transfer",
+                "created_at": "2021-01-01T00:00:00Z",
+                "updated_at": "2021-01-01T00:00:00Z"
+            }
+        }
+   },
+   "TestGetTransactionsByUserID": {
+        "Request": {    
+            "Method": "GET",
+            "URL": "api/transaction/user/1",
+            "Body": {}
+        },
+        "Response": {
+            "Status": 200,
+            "Body": 
+                {
+                "id": "1",
+                "debit_user_id": "1",
+                "credit_user_id": "2",
+                "amount": 1000,
+                "currency": "USD",
+                "status": "completed",
+                "transaction_type": "transfer",
+                "created_at": "2021-01-01T00:00:00Z",
+                    "updated_at": "2021-01-01T00:00:00Z"
+                }
+        }
+   },
+    "TestValidateNegativeAmountTransferMoneyRequest": {
+        "Request": {
+            "Method": "POST",
+            "URL": "api/transaction/transfer",
+            "Body": {
+                "receiver_id": "2",
+                "sender_id": "1",
+                "amount": -1000,
+                "currency": "USD"
+            }
+        },
+        "Response": {
+            "status": 400,
+            "body": {
+                "code": "VALIDATION_ERROR",
+                "message": "Amount is invalid"
+            }
+        }
+    },
+    "TestValidateSenderAndReceiverSameTransferMoneyRequest": {
+        "Request": {
+            "Method": "POST",
+            "URL": "api/transaction/transfer",
+            "Body": {
+                "receiver_id": "1",
+                "sender_id": "1",
+                "amount": 1000,
+                "currency": "USD"
+            }
+        },
+        "Response": {
+            "Status": 400,
+            "Body": {
+                "code": "VALIDATION_ERROR",
+                "message": "ReceiverID and SenderID cannot be the same"
+            }
+        }
+    },
+    "TestValidateSenderDoesNotExistTransferMoneyRequest": {
+        "Request": {
+            "Method": "POST",
+            "URL": "api/transaction/transfer",
+            "Body": {
+                "receiver_id": "1",
+                "sender_id": "abc",
+                "amount": 1000,
+                "currency": "USD"
+            }
+        },
+        "Response": {
+            "Status": 404,
+            "Body": {
+                "code": "WALLET_NOT_FOUND",
+                "message": "Wallet not found for userID: abc"
+            }
+        }
+    },
+    "TestCannotTransferMoreThanBalance": {  
+        "Request": {
+            "Method": "POST",
+            "URL": "api/transaction/transfer",
+            "Body": {
+                "receiver_id": "2",
+                "sender_id": "1",
+                "amount": 1000000000,
+                "currency": "USD"
+            }
+        },
+        "Response": {
+            "status": 400,
+            "body": {
+                "code": "INSUFFICIENT_BALANCE",
+                "message": "Insufficient Balance"
+            }
+        }
+    },
+    "TestTransferMoney": {
+        "Request": {
+            "Method": "POST",
+            "URL": "api/transaction/transfer",
+            "Body": {
+                "receiver_id": "2",
+                "amount": "1000",
+                "currency": "USD"
+            }
+        },
+        "Response": {
+            "status": 200,
+            "body": {
+                "id": "1",
+                "debit_wallet_id": "1",
+                "credit_wallet_id": "2",
+                "amount": "1000",
+                "currency": "USD",
+                "status": "completed",
+                "transaction_type": "transfer",
+                "created_at": "2021-01-01T00:00:00Z",
+                "updated_at": "2021-01-01T00:00:00Z"
+            }
+        }
+    }
+}
