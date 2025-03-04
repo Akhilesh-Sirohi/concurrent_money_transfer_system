@@ -54,7 +54,7 @@ A high-performance, concurrent money transfer system built with Go. This system 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/concurrent_money_transfer_system.git
+   git clone https://github.com/Akhilesh-Sirohi/concurrent_money_transfer_system.git
    cd concurrent_money_transfer_system
    ```
 
